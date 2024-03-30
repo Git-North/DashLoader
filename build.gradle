@@ -135,21 +135,28 @@ tasks.register("publishMod") {
 tasks.register("getVersion") {
     print("$project.version")
 }
-
 publishing {
-    repositories {
-        maven {
-            name = "notalpha"
-            url = "https://notalpha.dev/maven/releases"
-            credentials(PasswordCredentials)
-            authentication {
-                basic(BasicAuthentication)
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
             }
         }
     }
-    publications {
-        maven(MavenPublication) {
-            from components.java
-        }
+
+    // select the repositories you want to publish to
+     repositories {
+         maven {
+             name = "GitHubPackages"
+             url = "https://maven.pkg.github.com/Git-North/DashLoader"
+             credentials {
+        username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+      }
     }
+  }
 }
